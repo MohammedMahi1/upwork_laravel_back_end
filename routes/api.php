@@ -1,0 +1,35 @@
+<?php
+
+use App\Http\Controllers\Auth\OtpController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+Route::middleware('guest:sanctum')->group(function () {
+
+    //Authentication logic
+    Route::post("/user/register", [UserController::class, "register"]);
+    Route::post("/user/login", [UserController::class, "login"]);
+
+    //OTP mail verification
+    Route::post('/otp/send', [OtpController::class, 'sendOtp']);
+    Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);
+
+    //Reset password
+
+
+});
+    Route::post('/user/forgot-password', [PasswordResetController::class, 'sendResetPasswordLink']);
+    Route::post('/user/reset-password', [PasswordResetController::class, 'reset']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    //Logout auth
+    Route::delete('/user/logout/{token?}', [UserController::class, "logout"]);
+
+});
