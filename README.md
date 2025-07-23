@@ -1,1 +1,1 @@
-<h1  align="center">BACK-END PROJECT SCOP FOR UPWORK </h1>
+<h1  align="center">BACK-END PROJECT SCOPE FOR UPWORK </h1>
