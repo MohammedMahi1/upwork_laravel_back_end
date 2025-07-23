@@ -9,6 +9,42 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
+    // User methods
+    public function index(Request $request)
+    {
+        return response()->json([
+            'data' => Auth::user()
+        ]);
+    }
+    public function updateProfile(Request $request)
+    {
+        $user= Auth::user();
+        $request->validate([
+            "email"=> "required|email|unique:users,email,{$user->id}",
+            "name"=> "required|string|max:255",
+        ]);
+    }
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            "current_password" => "required|string|min:8|max:12",
+            "new_password" => "required|string|min:8|max:12|confirmed",
+        ]);
+        if (password_verify($request->current_password, $user->password)) {
+            $user->password = bcrypt($request->new_password);
+            $user->save();
+            return response()->json([
+                "message" => "Password updated successfully"
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "Current password is incorrect"
+            ], 403);
+        }
+    }
+
+    // Authentication methods
     public function register(Request $request)
     {
         $request->validate([

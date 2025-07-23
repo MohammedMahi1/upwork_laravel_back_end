@@ -32,4 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     //Logout auth
     Route::delete('/user/logout/{token?}', [UserController::class, "logout"]);
 
+
+    //User profile
+    Route::put('/user/update/profile', [UserController::class, "updateProfile"]);
+    Route::put('/user/update/password', [UserController::class, "updatePassword"]);
+    Route::get('/user', [UserController::class, "index"]);
+
 });
