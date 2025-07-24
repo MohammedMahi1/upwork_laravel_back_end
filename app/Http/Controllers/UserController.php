@@ -67,7 +67,7 @@ class UserController extends Controller
         
         $validationRequests = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string|max:12'
+            'password' => 'required|string|max:20|min:7',
         ]);
         if (Auth::guard('web')->attempt($validationRequests)) {
             $device = $request->userAgent();
