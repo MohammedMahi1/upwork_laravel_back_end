@@ -18,10 +18,10 @@ class UserController extends Controller
     }
     public function updateProfile(Request $request)
     {
-        $user= Auth::user();
+        $user = Auth::user();
         $request->validate([
-            "email"=> "required|email|unique:users,email,{$user->id}",
-            "name"=> "required|string|max:255",
+            "email" => "required|email|unique:users,email,{$user->id}",
+            "name" => "required|string|max:255",
         ]);
     }
     public function updatePassword(Request $request)
@@ -57,14 +57,16 @@ class UserController extends Controller
             "email" => $request->email,
             "password" => $request->password,
         ]);
-        $createUser->save();
+        $device = $request->userAgent();
+        $token = $createUser->createToken($device)->plainTextToken;
         return response()->json([
-            "message" => "Account created successfully"
+            "message" => "Account created successfully",
+            "token" => $token,
         ], 200);
     }
     public function login(Request $request)
     {
-        
+
         $validationRequests = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string|max:20|min:7',
@@ -74,14 +76,13 @@ class UserController extends Controller
             $token = Auth::user()->createToken($device)->plainTextToken;
             return response()->json([
                 "user" => Auth::user(),
-                "token" => $token
+                "token" => $token,
             ]);
         } else {
             return response()->json([
                 "message" => "Email or Password is incorrect"
             ], 403);
         }
-        
     }
     public function logout($token = null)
     {
@@ -90,15 +91,14 @@ class UserController extends Controller
             $user->currentAccessToken()->delete();
             return response()->json([
                 'message' => 'logout successful',
-            ],200);
+            ], 200);
         }
         $personaleToken = PersonalAccessToken::findToken($token);
         if ($user->id === $personaleToken->tokenable_id && get_class($user) === $personaleToken->tokenable_type) {
             $personaleToken->delete();
             return response()->json([
                 'message' => 'logout successful',
-            ],200);
+            ], 200);
         }
-
     }
 }
