@@ -77,10 +77,9 @@ class UserController extends Controller
                 "token" => $token
             ]);
         } else {
-            return response()->json(
-                "Email or Password is incorrect",
-                403
-            );
+            return response()->json([
+                "message" => "Email or Password is incorrect"
+            ], 403);
         }
         
     }
