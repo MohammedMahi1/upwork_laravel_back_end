@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
@@ -26,34 +27,36 @@ class OtpController extends Controller
 
         Mail::to($request->email)->send(new SendOtpMail($otp));
 
-        return response()->json(['message' => 'OTP sent successfully.'],200);
+        return response()->json(['message' => 'OTP sent successfully.'], 200);
     }
 
     public function verifyOtp(Request $request)
     {
+
         $request->validate([
             'email' => 'required|email',
             'otp_code' => 'required'
         ]);
+
         $user = User::where('email', $request->email)->first();
+
         if ($user->is_verify) {
             return response()->json(['message' => 'Email already verified.'], 200);
         }
+
         $otpEntry = EmailOtp::where('email', $request->email)
             ->where('otp_code', $request->otp_code)
             ->where('expires_at', '>', now())
             ->latest()
             ->first();
 
-
         if (!$otpEntry) {
             return response()->json(['message' => 'Invalid or expired OTP.'], 422);
         }
-            $user->is_verify = true;
-            $user->email_verified_at = Carbon::now();
-            $user->save();
-            $otpEntry->delete();
-            return response()->json(['verified'=>true],200);
-
+        $user->is_verify = true;
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+        $otpEntry->delete();
+        return response()->json(['verified' => true], 200);
     }
 }

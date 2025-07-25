@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     //Logout auth
     Route::delete('/user/logout/{token?}', [UserController::class, "logout"]);
 
+    //Cancel otp account creation
+    Route::post('/otp/cancel-otp-creating', [UserController::class, "cancelOtpAction"]);
 
     //User profile
     Route::put('/user/update/profile', [UserController::class, "updateProfile"]);

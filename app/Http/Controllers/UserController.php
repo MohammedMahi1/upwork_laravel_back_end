@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmailOtp;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         return response()->json([
-            'data' => Auth::user()
+            'user' => Auth::user()
         ]);
     }
     public function updateProfile(Request $request)
@@ -62,6 +63,7 @@ class UserController extends Controller
         return response()->json([
             "message" => "Account created successfully",
             "token" => $token,
+            "is_verify" => 0,
         ], 200);
     }
     public function login(Request $request)
@@ -84,6 +86,7 @@ class UserController extends Controller
             ], 403);
         }
     }
+
     public function logout($token = null)
     {
         $user = Auth::guard('sanctum')->user();
@@ -100,5 +103,19 @@ class UserController extends Controller
                 'message' => 'logout successful',
             ], 200);
         }
+    }
+
+    public function cancelOtpAction()
+    {
+        $user = Auth::user();
+        $email = $user->email;
+        $user = User::where('email', $email)->first();
+        $otpEntry = EmailOtp::where('email', $email)
+            ->first();
+        $otpEntry->delete();
+        $user->delete();
+        return response()->json([
+            'message' => 'Account deleted successfully',
+        ], 200);
     }
 }
