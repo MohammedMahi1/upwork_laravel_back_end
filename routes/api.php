@@ -33,11 +33,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user/logout/{token?}', [UserController::class, "logout"]);
 
     //Cancel otp account creation
-    Route::post('/otp/cancel-otp-creating', [UserController::class, "cancelOtpAction"]);
+    Route::delete('/otp/cancel-otp-creating/{token?}', [UserController::class, "cancelOtpAction"]);
 
     //User profile
     Route::put('/user/update/profile', [UserController::class, "updateProfile"]);
     Route::put('/user/update/password', [UserController::class, "updatePassword"]);
     Route::get('/user', [UserController::class, "index"]);
+    Route::get('/test', [UserController::class, "test"]);
 
 });

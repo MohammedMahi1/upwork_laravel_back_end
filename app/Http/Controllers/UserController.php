@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendOtpMail;
 use App\Models\EmailOtp;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
+
+
     // User methods
     public function index(Request $request)
     {
@@ -17,6 +21,8 @@ class UserController extends Controller
             'user' => Auth::user()
         ]);
     }
+
+
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
@@ -25,6 +31,8 @@ class UserController extends Controller
             "name" => "required|string|max:255",
         ]);
     }
+
+
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
@@ -58,6 +66,15 @@ class UserController extends Controller
             "email" => $request->email,
             "password" => $request->password,
         ]);
+        $otp = rand(100000, 999999);
+
+        EmailOtp::create([
+            'email' => $request->email,
+            'otp_code' => $otp,
+            'expires_at' => now()->addMinutes(5),
+        ]);
+
+        Mail::to($request->email)->send(new SendOtpMail($otp));
         $device = $request->userAgent();
         $token = $createUser->createToken($device)->plainTextToken;
         return response()->json([
@@ -105,15 +122,31 @@ class UserController extends Controller
         }
     }
 
-    public function cancelOtpAction()
+    public function cancelOtpAction($token = null)
     {
-        $user = Auth::user();
-        $email = $user->email;
+        $userAuth = Auth::user();
+
+        $email = $userAuth->email;
         $user = User::where('email', $email)->first();
         $otpEntry = EmailOtp::where('email', $email)
             ->first();
-        $otpEntry->delete();
-        $user->delete();
+        if (!$otpEntry) {
+            return response()->json([
+                'message' => 'No OTP entry found for this email',
+            ], 404);
+        }
+        if (null === $token) {
+            $userAuth->currentAccessToken()->delete();
+            $otpEntry->delete();
+            $user->delete();
+        } else {
+            $personaleToken = PersonalAccessToken::findToken($token);
+            if ($user->id === $personaleToken->tokenable_id && get_class($userAuth) === $personaleToken->tokenable_type) {
+                $personaleToken->delete();
+                $otpEntry->delete();
+                $user->delete();
+            }
+        }
         return response()->json([
             'message' => 'Account deleted successfully',
         ], 200);
