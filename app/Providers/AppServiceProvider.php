@@ -20,9 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-            ResetPassword::createUrlUsing(function ($notifiable, string $token) {
-        $email = urlencode($notifiable->getEmailForPasswordReset());
-        return "http://localhost:3000/reset-password?token={$token}&email={$email}";
-    });
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+            $email = urlencode($notifiable->getEmailForPasswordReset());
+            return "http://localhost:5173/update-password?token=$token&email=$email";
+        });
     }
 }

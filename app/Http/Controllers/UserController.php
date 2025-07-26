@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
@@ -22,14 +23,30 @@ class UserController extends Controller
         ]);
     }
 
-
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
+        $userId = Auth::user()->id;
         $request->validate([
-            "email" => "required|email|unique:users,email,{$user->id}",
-            "name" => "required|string|max:255",
+            "email" => ['email',Rule::unique('users')->ignore($userId),"sometimes"],
+            "first_name" => "string|max:255|sometimes",
+            "last_name" => "string|max:255|sometimes",
+            "bio" => "string|max:300|nullable|sometimes",
+            "img_url"=>"string|sometimes",
+            "img_name"=>"string|sometimes"
         ]);
+        $findUser = User::findOrFail($userId);
+        $findUser->update([
+            "first_name"=>$request->first_name,
+            "last_name"=>$request->last_name,
+            "email"=>$request->email ,
+            "img_url"=>$request->img_url,
+            "img_name"=>$request->img_name,
+            "bio"=>$request->bio,
+        ]);
+        return response()->json([
+            "message"=>"Profile updated !",
+            "user"=>$findUser
+        ],200);
     }
 
 
@@ -57,12 +74,14 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:7|max:20|confirmed',
         ]);
         $createUser = User::create([
-            "name" => $request->name,
+            "first_name" => $request->first_name,
+            "last_name" => $request->last_name,
             "email" => $request->email,
             "password" => $request->password,
         ]);
@@ -151,4 +170,5 @@ class UserController extends Controller
             'message' => 'Account deleted successfully',
         ], 200);
     }
+
 }

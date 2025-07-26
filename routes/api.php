@@ -16,9 +16,7 @@ Route::middleware('guest:sanctum')->group(function () {
     Route::post("/user/register", [UserController::class, "register"]);
     Route::post("/user/login", [UserController::class, "login"]);
 
-    //OTP mail verification
-    Route::post('/otp/send', [OtpController::class, 'sendOtp']);
-    Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);
+
 
     //Reset password
 
@@ -31,9 +29,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Logout auth
     Route::delete('/user/logout/{token?}', [UserController::class, "logout"]);
-
-    //Cancel otp account creation
+    
+    //OTP mail verification
     Route::delete('/otp/cancel-otp-creating/{token?}', [UserController::class, "cancelOtpAction"]);
+    Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);
+    Route::post('/otp/send', [OtpController::class, 'sendOtp']);
 
     //User profile
     Route::put('/user/update/profile', [UserController::class, "updateProfile"]);
