@@ -41,4 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //Transport jobs
     Route::get('/transport/jobs', [TransportController::class, "jobs"]);
     Route::post('/transport/jobs/add', [TransportController::class, "storeJobs"]);
+
+    //Add Image Profile
+    Route::post('/user/add-image', [UserController::class, "addImageProfile"]);
 });

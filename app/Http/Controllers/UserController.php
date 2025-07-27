@@ -27,26 +27,26 @@ class UserController extends Controller
     {
         $userId = Auth::user()->id;
         $request->validate([
-            "email" => ['email',Rule::unique('users')->ignore($userId),"sometimes"],
+            "email" => ['email', Rule::unique('users')->ignore($userId), "sometimes"],
             "first_name" => "string|max:255|sometimes",
             "last_name" => "string|max:255|sometimes",
             "bio" => "string|max:300|nullable|sometimes",
-            "img_url"=>"string|sometimes",
-            "img_name"=>"string|sometimes"
+            "img_url" => "string|sometimes",
+            "img_name" => "string|sometimes"
         ]);
         $findUser = User::findOrFail($userId);
         $findUser->update([
-            "first_name"=>$request->first_name,
-            "last_name"=>$request->last_name,
-            "email"=>$request->email ,
-            "img_url"=>$request->img_url,
-            "img_name"=>$request->img_name,
-            "bio"=>$request->bio,
+            "first_name" => $request->first_name,
+            "last_name" => $request->last_name,
+            "email" => $request->email,
+            "img_url" => $request->img_url,
+            "img_name" => $request->img_name,
+            "bio" => $request->bio,
         ]);
         return response()->json([
-            "message"=>"Profile updated !",
-            "user"=>$findUser
-        ],200);
+            "message" => "Profile updated !",
+            "user" => $findUser
+        ], 200);
     }
 
 
@@ -69,7 +69,24 @@ class UserController extends Controller
             ], 403);
         }
     }
-
+    public function add_img(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            "img_url" => "required|string",
+            "img_name" => "required|file|mimes:jpg,png,gif|max:2048",
+        ]);
+        $imgName = $request->img_name->getClientOriginalName();
+        $imgPath = $request->img_name->storeAs('images', $imgName, 'public');
+        $user->img_url = $imgPath;
+        $user->img_name = $imgName;
+        $user->save();
+        return response()->json([
+            "message" => "Image uploaded successfully",
+            "img_url" => $user->img_url,
+            "img_name" => $user->img_name,
+        ], 200);
+    }
     // Authentication methods
     public function register(Request $request)
     {
@@ -170,5 +187,4 @@ class UserController extends Controller
             'message' => 'Account deleted successfully',
         ], 200);
     }
-
 }
