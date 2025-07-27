@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('email_otps', function (Blueprint $table) {
-    $table->id();
-    $table->string('email');
-    $table->string('otp_code');
-    $table->timestamp('expires_at');
-    $table->timestamps();
+            $table->id();
+            $table->string('email');
+            $table->string('otp_code');
+            $table->timestamp('expires_at');
+            $table->timestamps();
         });
     }
 

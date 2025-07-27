@@ -17,11 +17,6 @@ Route::middleware('guest:sanctum')->group(function () {
     Route::post("/user/register", [UserController::class, "register"]);
     Route::post("/user/login", [UserController::class, "login"]);
 
-
-
-    //Reset password
-
-
 });
     Route::post('/user/forgot-password', [PasswordResetController::class, 'sendResetPasswordLink']);
     Route::post('/user/reset-password', [PasswordResetController::class, 'reset']);
