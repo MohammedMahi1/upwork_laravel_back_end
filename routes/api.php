@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,4 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, "index"]);
     Route::get('/test', [UserController::class, "test"]);
 
+
+    //Transport jobs
+    Route::get('/transport/jobs', [TransportController::class, "jobs"]);
+    Route::post('/transport/jobs/add', [TransportController::class, "storeJobs"]);
 });
