@@ -69,16 +69,16 @@ class UserController extends Controller
             ], 403);
         }
     }
-    public function add_img(Request $request)
+    public function addImageProfile(Request $request)
     {
         $user = Auth::user();
         $request->validate([
-            "img_url" => "required|string",
-            "img_name" => "required|file|mimes:jpg,png,gif|max:2048",
+            "img_name" => "required|file|mimes:jpg,png,gif",
         ]);
         $imgName = $request->img_name->getClientOriginalName();
         $imgPath = $request->img_name->storeAs('images', $imgName, 'public');
-        $user->img_url = $imgPath;
+        $publicPat = asset('storage/' . $imgPath);
+        $user->img_url = $publicPat;
         $user->img_name = $imgName;
         $user->save();
         return response()->json([
